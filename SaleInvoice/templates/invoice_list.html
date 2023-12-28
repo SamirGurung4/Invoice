@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Invoice List</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Invoice List</h1>
+
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <!-- Search Form -->
+        <form method="get" class="mb-3">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search by Invoice ID" name="invoice_id" value="{{ request.GET.invoice_id }}">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </form>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Invoice ID</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Payment Method</th>
+                    <th scope="col">Customer</th>
+                    <th scope="col">Product Details</th>
+                    <th scope="col">Tax</th>
+                    <th scope="col">Total Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                    <tr>
+                        <td>{{ invoice.Invoice_ID }}</td>
+                        <td>{{ invoice.Date }}</td>
+                        <td>{{ invoice.Payment_method }}</td>
+                        <td>{{ invoice.Customer.Name }}</td>
+                        <td>
+                            <ul>
+                                {% for item in invoice.invoiceitem_set.all %}
+                                    <li>{{ item.Product.Product_Name }} - Quantity: {{ item.Quantity }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>${{ invoice.Tax }}</td>
+                        <td>${{ invoice.Total_Amount }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="button" class="btn btn-primary mt-3" onclick="location.href='{% url 'create_invoice' %}'">Create New Invoice</button>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

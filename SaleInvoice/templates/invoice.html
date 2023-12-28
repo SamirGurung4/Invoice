@@ -1,0 +1,106 @@
+<!-- invoice.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Create Invoice</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Invoice</h1>
+        <form id="invoiceForm" method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="Date">Date:</label>
+                <input type="date" class="form-control" id="Date" name="Date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="Payment_method">Payment Method:</label>
+                <select class="form-control" id="Payment_method" name="Payment_method" required>
+                    <option value="cash">Cash</option>
+                    <option value="credit_card">Credit/ATM Card</option>
+                    <option value="bank_transfer">Bank Transfer</option>
+                    <option value="QR">QR</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="Customer">Customer:</label>
+                <input type="text" class="form-control" id="Customer" name="Customer" required>
+            </div>
+
+            <div class="form-group">
+                <label for="Product">Product:</label>
+                <select class="form-control" id="id_invoiceitem_set-0-Product" name="Product" required>
+                    {% for product in products %}
+                        <option value="{{ product.Product_Name }}" data-price="{{ product.Price }}">{{ product.Product_Name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="Quantity">Quantity:</label>
+                <input type="number" class="form-control" id="id_invoiceitem_set-0-Quantity" name="Quantity" required>
+            </div>
+
+            <div class="form-group">
+                <label for="Price">Price:</label><br>
+                <div id="Price"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="Tax">Tax:</label>
+                <input type="hidden" id="TaxInput" name="Tax" >
+                <div id="Tax"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="TotalAmount">Total Amount:</label>
+                <input type="hidden" id="TotalInput" name="Total_Amount" >
+
+                <div id="TotalAmount"> </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="saveButton">Save Invoice</button>
+        </form><br>
+
+        <button type="button" class="btn btn-secondary" onclick="location.href='{% url 'invoice_list' %}'">Back to Invoice List</button>
+    </div>
+
+    <script>
+    $(document).ready(function () {
+        // Function to update total amount
+        function updateTotalAmount() {
+            var quantity = parseFloat($('#id_invoiceitem_set-0-Quantity').val()) || 0;
+            var productPrice = parseFloat($('#id_invoiceitem_set-0-Product option:selected').attr('data-price')) || 0;
+
+            // Calculate tax based on product price and quantity
+            var tax = (quantity * productPrice) * 0.13;  // Assuming tax rate is 13%
+
+            $('#Tax').text(tax.toFixed(2));
+            $('#TaxInput').val(tax.toFixed(2));
+
+            $('#Price').text(productPrice.toFixed(2));
+
+            var totalAmount = quantity * productPrice + tax;
+            $('#TotalAmount').text(totalAmount.toFixed(2));
+            $('#TotalInput').val(totalAmount.toFixed(2));
+        }
+
+        // Bind change event to Quantity and Product fields
+        $('#id_invoiceitem_set-0-Quantity, #id_invoiceitem_set-0-Product').change(updateTotalAmount);
+
+        // Initial calculation on page load
+        updateTotalAmount();
+    });
+</script>
+
+</body>
+</html>
